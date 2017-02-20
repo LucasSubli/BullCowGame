@@ -5,23 +5,29 @@
 
 #include <iostream>
 #include <string>
-
-using namespace std;
+#include "FBullCowGame.h"
 
 void PrintIntro();
-string GetAndPrintGuess();
+void PlayGame();
+std::string GetGuess();
+bool AskToPlayAgain();
+
+// instantiate a new game
+FBullCowGame BCGame;
 
 // the entry point for our application
 int main() {
 
-	// prints the intro
+	bool bPlayAgain = false;
+
 	PrintIntro();
 
-	// gets the user guess
-	GetAndPrintGuess();
+	do {
+		PlayGame();
+		bPlayAgain = AskToPlayAgain();
+	} while (bPlayAgain);
 
-	// print an endl for fashion
-	cout << endl;
+	// exit the application
 	return 0;
 }
 
@@ -32,23 +38,52 @@ void PrintIntro() {
 	constexpr int WORD_LENGTH = 9;
 
 	// introduce  the game
-	cout << "Welcome to Bulls and Cows, a fun word game." << endl;
-	cout << "Can you guess the " << WORD_LENGTH << " letter isogram I'm thinking of?" << endl;
-	cout << endl;
+	std::cout << "Welcome to Bulls and Cows, a fun word game." << std::endl;
+	std::cout << "Can you guess the " << WORD_LENGTH << " letter isogram I'm thinking of?" << std::endl;
+	std::cout << std::endl;
 
 	return;
 }
 
+// play the game
+void PlayGame() {
+
+	int MaxTries = BCGame.GetMaxTries();
+
+	// loop for the number of turns asking for guesses
+	for (int count = 1; count <= MaxTries; count++) {
+
+		std::string Guess = GetGuess();
+		// repeat the guess to the user
+		std::cout << "Your guess: " << Guess << std::endl;
+		// another endline for fashion
+		std::cout << std::endl;
+	}
+}
+
 // gets the user guess
-string GetAndPrintGuess() {
+std::string GetGuess() {
 
-	string Guess = "";
+	int CurrentTry = BCGame.GetCurrentTry();
 
-	cout << "Enter your guess: ";
-	getline(cin, Guess);
+	std::string Guess = "";
 
-	// repeat the guess to the user
-	cout << "Your guess: " << Guess << endl;
+	std::cout << "Try " << CurrentTry << ". ";
+	std::cout << "Enter your guess: ";
+	std::getline(std::cin, Guess);
 
 	return Guess;
+}
+
+
+// asks the user if he wats to play again
+bool AskToPlayAgain() {
+
+	std::cout << "Do you want to play again (y/n)?";
+	std::string Response = "";
+	std::getline(std::cin, Response);
+	// another endline for fashion
+	std::cout << std::endl;
+
+	return (Response[0] == 'y' || Response[0] == 'Y');
 }
