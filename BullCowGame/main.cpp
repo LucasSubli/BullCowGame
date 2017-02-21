@@ -1,16 +1,26 @@
-// Main class for the Bull Cow Game
-// author: lucas.subli@gmail.com
-// for several reasons the Unreal Coding Standard will be used
-// https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/index.html
+/* Main class for the Bull Cow Game
+This is the console executable for the BullCow class
+acting as the view in a MVC pattern
+
+author: lucas.subli@gmail.com
+for several reasons the Unreal Coding Standard will be used
+https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/index.html
+ */
 
 #include <iostream>
 #include <string>
 #include "FBullCowGame.h"
 
+
+// make it closer to UE4 syntax
+using FText = std::string;
+using int32 = int;
+
 void PrintIntro();
 void PlayGame();
-std::string GetGuess();
+FText GetValidGuess();
 bool AskToPlayAgain();
+void PrintGameSummary();
 
 // instantiate a new game
 FBullCowGame BCGame;
@@ -34,12 +44,10 @@ int main() {
 // prints the intro of the game
 void PrintIntro() {
 
-	// pre define the sizae of the word used on the game
-	constexpr int WORD_LENGTH = 9;
-
 	// introduce  the game
 	std::cout << "Welcome to Bulls and Cows, a fun word game." << std::endl;
-	std::cout << "Can you guess the " << WORD_LENGTH << " letter isogram I'm thinking of?" << std::endl;
+	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength();
+	std::cout << " letter isogram I'm thinking of?" << std::endl;
 	std::cout << std::endl;
 
 	return;
@@ -48,39 +56,78 @@ void PrintIntro() {
 // play the game
 void PlayGame() {
 
-	int MaxTries = BCGame.GetMaxTries();
+	BCGame.Reset();
+	int32 MaxTries = BCGame.GetMaxTries();
 
-	// loop for the number of turns asking for guesses
-	for (int count = 1; count <= MaxTries; count++) {
+	// loop for guesses while the game is not won
+	// and there are tries remaining
+	while (!BCGame.IsGameWon() && BCGame.GetCurrentTry() <= MaxTries) {
+		FText Guess = GetValidGuess();
 
-		std::string Guess = GetGuess();
-		// repeat the guess to the user
-		std::cout << "Your guess: " << Guess << std::endl;
-		// another endline for fashion
-		std::cout << std::endl;
+		// submit valid guess to the game andf get the count back
+		FBullCowCount BullCowCount = BCGame.SubmitValidGuess(Guess);
+
+		// print number of bulls and cows
+		std::cout << "Bulls : " << BullCowCount.Bulls;
+		std::cout << ". Cows : " << BullCowCount.Cows << "\n\n";
 	}
+
+	PrintGameSummary();
+
+
+	return;
 }
 
-// gets the user guess
-std::string GetGuess() {
+// loop until the user gives a valid guess
+FText GetValidGuess() {
 
-	int CurrentTry = BCGame.GetCurrentTry();
+	EGuessStatus Status = EGuessStatus::Invalid_Status;
+	FText Guess = "";
 
-	std::string Guess = "";
+	do {
+		// get a guess from the user
+		int32 CurrentTry = BCGame.GetCurrentTry();
+		std::cout << "Try " << CurrentTry << ". Enter your guess: ";
+		std::getline(std::cin, Guess);
 
-	std::cout << "Try " << CurrentTry << ". ";
-	std::cout << "Enter your guess: ";
-	std::getline(std::cin, Guess);
+		// verify the validity of the guess
+		Status = BCGame.CheckGuessValidity(Guess);
+		switch (Status) {
+			case EGuessStatus::Not_Isogram:
+				std::cout << "Please enter a word without repeating letters.\n\n";
+				break;
+			case EGuessStatus::Wrong_Length:
+				std::cout << "Please enter a " << BCGame.GetHiddenWordLength() << " leter word.\n\n";
+				break;
+			case EGuessStatus::Not_Lowercase:
+				std::cout << "Please enter all lowercase letters.\n\n";
+				break;
+			default:
+				// assume the guess is valid
+				break;
+		}
+	} while (Status != EGuessStatus::OK); // keep looping until no errors
 
 	return Guess;
+}
+
+// print the game summary
+void PrintGameSummary() {
+
+	if (BCGame.IsGameWon()) {
+		std::cout << "WELL DONE - YOU WIN.\n\n";
+	} else {
+		std::cout << "YOU LOST - Better luck next time. \n\n";
+	}
+	return;
 }
 
 
 // asks the user if he wats to play again
 bool AskToPlayAgain() {
 
-	std::cout << "Do you want to play again (y/n)?";
-	std::string Response = "";
+	std::cout << "Do you want to play again with the same hidden word (y/n)?";
+	FText Response = "";
 	std::getline(std::cin, Response);
 	// another endline for fashion
 	std::cout << std::endl;
