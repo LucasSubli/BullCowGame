@@ -1,4 +1,11 @@
+/*Header file for the BullCowGame class
+
+author: lucas.subli@gmail.com
+for several reasons the Unreal Coding Standard will be used
+https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/index.html
+*/
 #pragma once
+
 #include <string>
 
 // make it closer to UE4 syntax
@@ -20,6 +27,7 @@ enum class EGuessStatus {
 	Not_Lowercase
 };
 
+// the class declaration
 class FBullCowGame {
 
 public:
@@ -32,14 +40,16 @@ public:
 
 	EGuessStatus CheckGuessValidity(FString) const;
 
-	void Reset(); // TODO make a more rich return value;
+	void Reset();
 	FBullCowCount SubmitValidGuess(FString);
 
 
 private:
 	// see constructor for initialisation
 	int32 MyCurrentTry;
-	int32 MyMaxTries;
 	FString MyHiddenWord;
 	bool bIsGameWon;
+
+	bool IsIsogram(FString) const;
+	bool IsLowercase(FString) const;
 };

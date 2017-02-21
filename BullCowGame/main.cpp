@@ -6,6 +6,7 @@ author: lucas.subli@gmail.com
 for several reasons the Unreal Coding Standard will be used
 https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/index.html
  */
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -16,6 +17,8 @@ https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/
 using FText = std::string;
 using int32 = int;
 
+
+// function prototypes as outside a class
 void PrintIntro();
 void PlayGame();
 FText GetValidGuess();
@@ -44,16 +47,33 @@ int main() {
 // prints the intro of the game
 void PrintIntro() {
 
-	// introduce  the game
-	std::cout << "Welcome to Bulls and Cows, a fun word game." << std::endl;
+	std::cout << "Welcome to Bulls and Cows, a fun word game.\n";
+	std::cout << std::endl;
+	std::cout << "If you type a right letter in a wrong place yout get a Cow." << std::endl;
+	std::cout << "         ___ " << std::endl;
+	std::cout << "        (o o) " << std::endl;
+	std::cout << "         \\ /-------\\ " << std::endl;
+	std::cout << "          O| COW  | \\ " << std::endl;
+	std::cout << "           |------|  * " << std::endl;
+	std::cout << "           ^      ^ " << std::endl;
+	std::cout << "If you type a right letter in the right place yout get a Bull." << std::endl;
+	std::cout << std::endl;
+	std::cout << "          }   {" << std::endl;
+	std::cout << "          (o o)" << std::endl;
+	std::cout << "   /-------\\ /" << std::endl;
+	std::cout << "  / | BULL |O " << std::endl;
+	std::cout << " *  |-,--- |  " << std::endl;
+	std::cout << "    ^      ^  " << std::endl;
+	std::cout << std::endl;
 	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength();
 	std::cout << " letter isogram I'm thinking of?" << std::endl;
+	std::cout << "Tip: An isogram is a word without a repeating letter" << std::endl;
 	std::cout << std::endl;
 
 	return;
 }
 
-// play the game
+// plays a single game to completion
 void PlayGame() {
 
 	BCGame.Reset();
@@ -86,8 +106,8 @@ FText GetValidGuess() {
 
 	do {
 		// get a guess from the user
-		int32 CurrentTry = BCGame.GetCurrentTry();
-		std::cout << "Try " << CurrentTry << ". Enter your guess: ";
+		int32 RemainingTries = BCGame.GetMaxTries() - BCGame.GetCurrentTry() + 1;
+		std::cout << RemainingTries << " tries remaining. Enter your guess: ";
 		std::getline(std::cin, Guess);
 
 		// verify the validity of the guess
